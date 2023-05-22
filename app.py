@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import collections
+from PIL import Image
 
 BLACK = 0
 WHITE = 255
@@ -140,8 +141,29 @@ def main():
     if uploaded_files:
         images = []
         for file in uploaded_files:
-            image = cv2.imdecode(np.frombuffer(file.read(), np.uint8), 1)
-            images.append(image)
+            # 画像ファイルをPIL Imageオブジェクトとして開く
+            pil_image = Image.open(file)
+        
+            # EXIFメタデータを取得
+            exif_data = pil_image._getexif()
+        
+            # 撮影日時を取得
+            capture_time = exif_data.get(36867)  # 36867はEXIFメタデータ中の撮影日時のタグID
+        
+            # 撮影日時をキーとして画像ファイルを辞書に追加
+            images.append((capture_time, cv2.imdecode(np.frombuffer(file.read(), np.uint8), 1)))
+
+        # 撮影日時でリストをソート
+        images.sort(key=lambda x: x[0])
+    
+        # 画像のみのリストに変換
+        images = [image for _, image in images]
+    
+        st.write("元の画像:")
+        for image in images:
+            st.image(image, channels="BGR", use_column_width=True)
+            #image = cv2.imdecode(np.frombuffer(file.read(), np.uint8), 1)
+            #images.append(image)
 
         st.write("元の画像:")
         for image in images:
