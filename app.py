@@ -8,6 +8,7 @@ BLACK = 0
 WHITE = 255
 
 def find_matching_region(images):
+    
     img = images[0]
     # BGR色空間からHSV色空間に変換
     image11 = cv2.cvtColor(img, cv2.COLOR_BGR2HSV_FULL)
@@ -78,8 +79,47 @@ def find_matching_region(images):
     clip_imgs.append(images[0][: margin_bottom, :])
     # 2枚目
     clip_imgs.append(clip_img)
+    
+    if len(images) > 2:
+        for i in range(1, len(images)-2):
+            # 2枚目のスキル画像
+            skill_img = images[i][margin_bottom -
+                                skill_height: margin_bottom, margin_left: skill_right]
+
+            # 3枚目
+            img = images[i + 1]
+
+            # グレースケール化
+            img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            skill_gray = cv2.cvtColor(skill_img, cv2.COLOR_BGR2GRAY)
+
+            res = cv2.matchTemplate(img_gray, skill_gray, cv2.TM_CCOEFF_NORMED)
+            min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+
+            # 結合用に切り抜いてみる
+            clip_img = img[max_loc[1] + skill_gray.shape[0]: margin_bottom, :]
+            clip_imgs.append(clip_img)
+
+        # end-1枚目のスキル画像
+        skill_img = images[len(images)  - 2][margin_bottom -
+                            skill_height: margin_bottom, margin_left: skill_right]
+
+        # 3枚目
+        img = images[len(images)-1]
+
+        # グレースケール化
+        img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        skill_gray = cv2.cvtColor(skill_img, cv2.COLOR_BGR2GRAY)
+
+        res = cv2.matchTemplate(img_gray, skill_gray, cv2.TM_CCOEFF_NORMED)
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+
+        # 結合用に切り抜いてみる
+        clip_img = img[max_loc[1] + skill_gray.shape[0]: , :]
+        clip_imgs.append(clip_img)
+
     len(clip_imgs)
-    print(len(clip_imgs))
+    
 
     width = clip_imgs[0].shape[1]
     height = sum(m.shape[0] for m in clip_imgs)
@@ -97,7 +137,7 @@ def main():
 
     uploaded_files = st.file_uploader("結合したい画像を選択してください", accept_multiple_files=True, type=['png', 'jpg', 'jpeg'])
 
-    if uploaded_files is not None:
+    if uploaded_files:
         images = []
         for file in uploaded_files:
             image = cv2.imdecode(np.frombuffer(file.read(), np.uint8), 1)
@@ -115,4 +155,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    
