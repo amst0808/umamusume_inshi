@@ -133,7 +133,7 @@ def find_matching_region(images):
 
 
 def main():
-    st.title("ウマ娘をがっちゃんこするやつ")
+    st.title("レシート因子作成君")
 
     uploaded_files = st.file_uploader("結合したい画像を選択してください", accept_multiple_files=True, type=['png', 'jpg', 'jpeg'])
 
@@ -147,16 +147,38 @@ def main():
 
         images.sort()
         st.write("元の画像:")
-        for image_name, image in images:
+
+        # Display the images in the current order
+        for i, (image_name, image) in enumerate(images):
             st.write(f"Image Name: {image_name}")
-            st.image(image, channels="BGR", use_column_width=True)
+            st.image(image, channels="BGR", use_column_width=True, caption=f"Image {i+1}")
 
-        images.reverse()
-        result_image = find_matching_region([image for _, image in images])
-        #result_image = find_matching_region(images)
+        # Create a list to store the reordered images
+        reordered_images = []
 
-        st.write("結合後の画像:")
-        st.image(result_image, channels="BGR", use_column_width=True)
+        # Drag-and-drop functionality to reorder the images
+        for i in range(len(images)):
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                st.image(images[i][1], use_column_width=True, caption=f"Image {i+1}")
+            with col2:
+                reordered_index = st.selectbox("Reorder", range(1, len(images)+1), index=i, key=i)
+                reordered_images.append(images[reordered_index-1][1])
+
+        #for image_name, image in images:
+            #st.write(f"Image Name: {image_name}")
+            #st.image(image, channels="BGR", use_column_width=True)
+
+        if st.button("がっちゃんこする"):
+            #reordered_images.reverse()
+            #images.reverse()
+            result_image = find_matching_region(reordered_images)
+            #result_image = find_matching_region([image for _, image in images])
+            #result_image = find_matching_region(images)
+
+            st.write("結合後の画像:")
+            st.image(result_image, channels="BGR", use_column_width=True)
 
 if __name__ == '__main__':
     main()
+    
