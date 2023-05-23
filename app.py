@@ -133,52 +133,43 @@ def find_matching_region(images):
 
 
 def main():
-    st.title("レシート因子作成君")
+    st.title("ウマ娘のやつ")
 
     uploaded_files = st.file_uploader("結合したい画像を選択してください", accept_multiple_files=True, type=['png', 'jpg', 'jpeg'])
 
     if uploaded_files:
         images = []
-        for i, file in enumerate(uploaded_files):
-            image_name = f"image{i+1}"
+        for file in uploaded_files:
+            #image_name = f"image{i+1}"
             image = cv2.imdecode(np.frombuffer(file.read(), np.uint8), 1)
-            images.append((image_name, image))
-            #images.append(image)
+            #images.append((image_name, image))
+            images.append(image)
 
-        images.sort()
         st.write("元の画像:")
+        
+        # Display images side by side
+        col_images = st.columns(len(images))
+        for i, col in enumerate(col_images):
+            col.image(images[i], channels="BGR", use_column_width=True)
+        
+        cols = st.columns(len(images))
+        selected_values = []
+        for col in range(len(images)):
+            key = f"selectbox_{col}"
+            index = col
+            selected_value = cols[col].selectbox(f'何枚目？', range(1, len(images)+1),index=index, key=key)
+            selected_values.append(selected_value)
 
-        # Display the images in the current order
-        for i, (image_name, image) in enumerate(images):
-            st.write(f"Image Name: {image_name}")
-            st.image(image, channels="BGR", use_column_width=True, caption=f"Image {i+1}")
-
-        # Create a list to store the reordered images
-        reordered_images = []
-
-        # Drag-and-drop functionality to reorder the images
-        for i in range(len(images)):
-            col1, col2 = st.columns([3, 1])
-            with col1:
-                st.image(images[i][1], use_column_width=True, caption=f"Image {i+1}")
-            with col2:
-                reordered_index = st.selectbox("Reorder", range(1, len(images)+1), index=i, key=i)
-                reordered_images.append(images[reordered_index-1][1])
-
-        #for image_name, image in images:
-            #st.write(f"Image Name: {image_name}")
-            #st.image(image, channels="BGR", use_column_width=True)
 
         if st.button("がっちゃんこする"):
-            #reordered_images.reverse()
-            #images.reverse()
-            result_image = find_matching_region(reordered_images)
-            #result_image = find_matching_region([image for _, image in images])
-            #result_image = find_matching_region(images)
-
+            #st.write(selected_values)
+            margin_images = [0] * 5
+            for i in range(len(images)):
+                margin_images[selected_values[i]-1] = images[i]
+                
+            result_image = find_matching_region(margin_images)
             st.write("結合後の画像:")
             st.image(result_image, channels="BGR", use_column_width=True)
 
 if __name__ == '__main__':
     main()
-    
