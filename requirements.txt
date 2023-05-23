@@ -3,4 +3,4 @@ streamlit
 matplotlib
 opencv-python-headless
 streamlit_tags
-opencv-python
+
