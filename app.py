@@ -24,13 +24,11 @@ def find_matching_region(images):
     # 画像の幅と高さ
     h, w = image11.shape
 
-    # 上から順に見ていく
+    # 上から順に
     for y in np.arange(int(h * 0.5), int(h * 0.85)):
         findWhite = False
-        # 左(一番左は飛ばす)から順に見ていく
+        # 左(一番左は飛ばす)から順に
         for x in np.arange(1, int(w * 0.5)):
-            # Windows版ではWindow枠があると、即黒を検知してしまうので、
-            # 「一度白を見つけた後に、黒を見つけたら」という条件にする
             if (not findWhite) & (image11[y, x] == WHITE):
                 findWhite = True
             elif (findWhite) & (image11[y, x] == BLACK):
@@ -70,7 +68,7 @@ def find_matching_region(images):
     res = cv2.matchTemplate(img_gray, skill_gray, cv2.TM_CCOEFF_NORMED)
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
 
-    # 結合用に切り抜いてみる
+    # 結合用に切り抜き
     clip_img = img[max_loc[1] + skill_gray.shape[0]: margin_bottom, :]
 
     #結合処理
@@ -96,7 +94,7 @@ def find_matching_region(images):
             res = cv2.matchTemplate(img_gray, skill_gray, cv2.TM_CCOEFF_NORMED)
             min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
 
-            # 結合用に切り抜いてみる
+            # 結合用に切り抜き
             clip_img = img[max_loc[1] + skill_gray.shape[0]: margin_bottom, :]
             clip_imgs.append(clip_img)
 
@@ -114,7 +112,7 @@ def find_matching_region(images):
         res = cv2.matchTemplate(img_gray, skill_gray, cv2.TM_CCOEFF_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
 
-        # 結合用に切り抜いてみる
+        # 結合用に切り抜き
         clip_img = img[max_loc[1] + skill_gray.shape[0]: , :]
         clip_imgs.append(clip_img)
 
@@ -162,8 +160,7 @@ def main():
 
 
         if st.button("がっちゃんこする"):
-            #st.write(selected_values)
-            margin_images = [0] * 5
+            margin_images = [0] * len(images)
             for i in range(len(images)):
                 margin_images[selected_values[i]-1] = images[i]
                 
