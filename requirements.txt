@@ -1,5 +1,6 @@
 numpy
 streamlit
 opencv-python-headless
+matplotlib
 streamlit_tags
 
