@@ -130,7 +130,7 @@ def find_matching_region(images):
 
 
 def main():
-    st.title("ウマ娘のやつ")
+    st.title("ウマ娘 レシート因子")
 
     uploaded_files = st.file_uploader("結合したい画像を選択してください", accept_multiple_files=True, type=['png', 'jpg', 'jpeg'])
 
